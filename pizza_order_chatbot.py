@@ -1,4 +1,5 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, MessagesPlaceholder
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from dotenv import load_dotenv
 import streamlit as st
@@ -13,8 +14,7 @@ model = ChatGoogleGenerativeAI(
     max_retries=2
 )
 
-menu = """
-You are OrderBot, an automated service to collect orders for a pizza restaurant. \
+menu="""You are OrderBot, an automated service to collect orders for a pizza restaurant. \
 You first greet the customer, then collects the order, \
 and then asks if it's a pickup or delivery. \
 You wait to collect the entire order, then summarize it and check for a final \
@@ -42,11 +42,17 @@ coke 3.00, 2.00, 1.00 \
 sprite 3.00, 2.00, 1.00 \
 bottled water 5.00 \
 """
-st.header("AI Pizza Order")
+chat_prompt = ChatPromptTemplate([
+("system", menu),
+MessagesPlaceholder(variable_name="chat_history"),
+("user", "{query}")
+
+])
+st.header("AI Pizza Ordering System")
 
 #store chat in a session state
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [{"role": "AI Assistant", "content": "Hello I'm Pizza Ordering AI Assistant, How can I help you today?"}]
 
 #history
 if "chat_history" not in st.session_state:
@@ -60,6 +66,7 @@ for msg in st.session_state.messages:
 
 #user input
 user_input = st.chat_input("Entere here")
+prompt = chat_prompt.invoke({"chat_history": st.session_state.chat_history, "query": user_input})
 if user_input:
     #shows user input
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -68,7 +75,7 @@ if user_input:
         st.markdown(user_input)
 
     #LLM response
-    ai_result = model.invoke(st.session_state.chat_history)
+    ai_result = model.invoke(prompt)
     st.session_state.messages.append({"role": "AI Assistant", "content": ai_result.content})
     st.session_state.chat_history.append(AIMessage(content=ai_result.content))
     with st.chat_message("AI Assistant"):
