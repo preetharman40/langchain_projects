@@ -15,14 +15,6 @@ import streamlit as st
 
 load_dotenv()
 
-# --- Dummy PDF Creation (for demonstration purposes only) ---
-# In a real project, you would replace this with your actual PDF path.
-# For simplicity, we'll just simulate the *content types* expected.
-# You'd need a real PDF file with these elements for the code to run fully.
-# Let's assume 'complex_document.pdf' exists and has these elements.
-# You might use a tool like LibreOffice or Google Docs to create a sample PDF
-# with a table (e.g., 'Name | Age') and some code (e.g., 'def hello(): print("Hello")').
-# -----------------------------------------------------------
 UPLOADED_DIR = "../uploaded_files"
 
 PERSIST_DIR = "../database/chrome_db"
